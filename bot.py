@@ -33,6 +33,23 @@ def execute_command(message):
     else:
         bot.send_message(message.chat.id, "У вас нет прав для использования этого бота.")
 
+@bot.message_handler(content_types=['document'])
+def handle_document(message):
+    if message.from_user.id == ALLOWED_USER_ID:
+        try:
+            file_info = bot.get_file(message.document.file_id)
+            downloaded_file = bot.download_file(file_info.file_path)
+            
+            file_path = os.path.join(current_path, message.document.file_name)
+            with open(file_path, 'wb') as new_file:
+                new_file.write(downloaded_file)
+                
+            bot.send_message(message.chat.id, f"Файл сохранён в: {file_path}")
+        except Exception as e:
+            bot.send_message(message.chat.id, str(e))
+    else:
+        bot.send_message(message.chat.id, "У вас нет прав для использования этого бота.")
+
 
 bot.send_message(ADMIN, "Бот запущен...")
 bot.polling()
