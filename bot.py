@@ -11,14 +11,14 @@ import time
 bot = telebot.TeleBot(API)
 
 @bot.message_handler(commands=['start', 'help'])
-def send_welcome(message):
+def send_welcome(message): # команда /start
     if message.from_user.id == ADMIN:
         bot.send_message(message.chat.id, "Привет!")
     else:
         bot.send_message(message.chat.id, "У вас нет прав для использования этого бота.")
 
 @bot.message_handler(func=lambda message: True)
-def execute_command(message):
+def execute_command(message): # обработка сообщения пользователя
     if message.from_user.id == ADMIN:
         try:
             # Выполнение команды в текущем пути
@@ -34,7 +34,7 @@ def execute_command(message):
         bot.send_message(message.chat.id, "У вас нет прав для использования этого бота.")
 
 @bot.message_handler(content_types=['document'])
-def handle_document(message):
+def handle_document(message): # обработка документа
     if message.from_user.id == ADMIN:
         try:
             file_info = bot.get_file(message.document.file_id)
@@ -51,7 +51,7 @@ def handle_document(message):
         bot.send_message(message.chat.id, "У вас нет прав для использования этого бота.")
 
 @bot.message_handler(commands=['restart'])
-def restart_bot(message):
+def restart_bot(message): # команда /restart
     if message.from_user.id == ADMIN:
         bot.send_message(message.chat.id, "Перезапуск бота...")
         time.sleep(1)  # Даем время для отправки сообщения
@@ -62,7 +62,7 @@ def restart_bot(message):
         bot.send_message(message.chat.id, "У вас нет прав для использования этого бота.")
 
 @bot.message_handler(commands=['cd'])
-def change_directory(message):
+def change_directory(message): # команда /cd
     if message.from_user.id == ADMIN:
         global FOLDER
         new_path = message.text[len("/cd "):].strip()
