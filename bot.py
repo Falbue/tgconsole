@@ -17,5 +17,22 @@ def send_welcome(message):
     else:
         bot.send_message(message.chat.id, "У вас нет прав для использования этого бота.")
 
+@bot.message_handler(func=lambda message: True)
+def execute_command(message):
+    if message.from_user.id == ALLOWED_USER_ID:
+        try:
+            # Выполнение команды в текущем пути
+            result = subprocess.run(message.text, shell=True, capture_output=True, text=True, cwd=current_path)
+            output = result.stdout + result.stderr
+            if not output:
+                output = "Команда выполнена, но нет вывода."
+            # Отправка результата выполнения
+            bot.send_message(message.chat.id, output)
+        except Exception as e:
+            bot.send_message(message.chat.id, str(e))
+    else:
+        bot.send_message(message.chat.id, "У вас нет прав для использования этого бота.")
+
+
 bot.send_message(ADMIN, "Бот запущен...")
 bot.polling()
