@@ -17,39 +17,6 @@ def send_welcome(message): # команда /start
     else:
         bot.send_message(message.chat.id, "У вас нет прав для использования этого бота.")
 
-@bot.message_handler(func=lambda message: True)
-def execute_command(message): # обработка сообщения пользователя
-    if message.from_user.id == ADMIN:
-        try:
-            # Выполнение команды в текущем пути
-            result = subprocess.run(message.text, shell=True, capture_output=True, text=True, cwd=FOLDER)
-            output = result.stdout + result.stderr
-            if not output:
-                output = "Команда выполнена, но нет вывода."
-            # Отправка результата выполнения
-            bot.send_message(message.chat.id, output)
-        except Exception as e:
-            bot.send_message(message.chat.id, str(e))
-    else:
-        bot.send_message(message.chat.id, "У вас нет прав для использования этого бота.")
-
-@bot.message_handler(content_types=['document'])
-def handle_document(message): # обработка документа
-    if message.from_user.id == ADMIN:
-        try:
-            file_info = bot.get_file(message.document.file_id)
-            downloaded_file = bot.download_file(file_info.file_path)
-            
-            file_path = os.path.join(FOLDER, message.document.file_name)
-            with open(file_path, 'wb') as new_file:
-                new_file.write(downloaded_file)
-                
-            bot.send_message(message.chat.id, f"Файл сохранён в: {file_path}")
-        except Exception as e:
-            bot.send_message(message.chat.id, str(e))
-    else:
-        bot.send_message(message.chat.id, "У вас нет прав для использования этого бота.")
-
 @bot.message_handler(commands=['restart'])
 def restart_bot(message): # команда /restart
     if message.from_user.id == ADMIN:
@@ -83,6 +50,45 @@ def change_directory(message): # команда /cd
     else:
         bot.send_message(message.chat.id, "У вас нет прав для использования этого бота.")
 
+@bot.message_handler(content_types=['document'])
+def handle_document(message): # обработка документа
+    if message.from_user.id == ADMIN:
+        try:
+            file_info = bot.get_file(message.document.file_id)
+            downloaded_file = bot.download_file(file_info.file_path)
+            
+            file_path = os.path.join(FOLDER, message.document.file_name)
+            with open(file_path, 'wb') as new_file:
+                new_file.write(downloaded_file)
+                
+            bot.send_message(message.chat.id, f"Файл сохранён в: {file_path}")
+        except Exception as e:
+            bot.send_message(message.chat.id, str(e))
+    else:
+        bot.send_message(message.chat.id, "У вас нет прав для использования этого бота.")
+
+def send_large_message(chat_id, text, max_length=4096): # Отправляет сообщение большими частями, если оно превышает max_length
+    if len(text) <= max_length:
+        bot.send_message(chat_id, text)
+    else:
+        for i in range(0, len(text), max_length):
+            bot.send_message(chat_id, text[i:i + max_length])
+
+@bot.message_handler(func=lambda message: True)
+def execute_command(message):  # обработка сообщения пользователя
+    if message.from_user.id == ADMIN:
+        try:
+            # Выполнение команды в текущем пути
+            result = subprocess.run(message.text, shell=True, capture_output=True, text=True, cwd=FOLDER)
+            output = result.stdout + result.stderr
+            if not output:
+                output = "Команда выполнена, но нет вывода."
+            # Отправка результата выполнения
+            send_large_message(message.chat.id, output)
+        except Exception as e:
+            send_large_message(message.chat.id, str(e))
+    else:
+        bot.send_message(message.chat.id, "У вас нет прав для использования этого бота.")
 
 bot.send_message(ADMIN, "Бот запущен...")
 bot.polling()
