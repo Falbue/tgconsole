@@ -1,6 +1,6 @@
-bot_api = ''
-folder = '/data/data/com.termux/files/home'
-id_admin = 1
+API = ''
+FOLDER = '/data/data/com.termux/files/home'
+ADMIN = 1
 # -----------------------------------------------------------
 import telebot
 import subprocess
