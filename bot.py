@@ -61,6 +61,28 @@ def restart_bot(message):
     else:
         bot.send_message(message.chat.id, "У вас нет прав для использования этого бота.")
 
+@bot.message_handler(commands=['cd'])
+def change_directory(message):
+    if message.from_user.id == ALLOWED_USER_ID:
+        global current_path
+        new_path = message.text[len("/cd "):].strip()
+        
+        if new_path == "":
+            # Переход на уровень выше
+            new_path = os.path.dirname(current_path)
+        else:
+            if not os.path.isabs(new_path):
+                # Относительный путь
+                new_path = os.path.join(current_path, new_path)
+        
+        if os.path.isdir(new_path):
+            current_path = new_path
+            bot.send_message(message.chat.id, f"Текущий путь изменён на: {current_path}")
+        else:
+            bot.send_message(message.chat.id, "Неверный путь. Попробуйте ещё раз.")
+    else:
+        bot.send_message(message.chat.id, "У вас нет прав для использования этого бота.")
+
 
 bot.send_message(ADMIN, "Бот запущен...")
 bot.polling()
