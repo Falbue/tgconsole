@@ -50,6 +50,17 @@ def handle_document(message):
     else:
         bot.send_message(message.chat.id, "У вас нет прав для использования этого бота.")
 
+@bot.message_handler(commands=['restart'])
+def restart_bot(message):
+    if message.from_user.id == ALLOWED_USER_ID:
+        bot.send_message(message.chat.id, "Перезапуск бота...")
+        time.sleep(1)  # Даем время для отправки сообщения
+        # Запускаем новый процесс и завершаем текущий
+        subprocess.Popen([sys.executable] + sys.argv)
+        os._exit(0)
+    else:
+        bot.send_message(message.chat.id, "У вас нет прав для использования этого бота.")
+
 
 bot.send_message(ADMIN, "Бот запущен...")
 bot.polling()
