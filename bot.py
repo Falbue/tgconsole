@@ -6,4 +6,4 @@ import telebot
 import subprocess
 import os
 import sys
-import time
+import timebot = telebot.TeleBot(API)
