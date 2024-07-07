@@ -1,6 +1,7 @@
 API = ''
 FOLDER = '/data/data/com.termux/files/home'
 ADMIN = 1
+bot = ''
 # -----------------------------------------------------------
 import telebot
 import subprocess
@@ -8,7 +9,24 @@ import os
 import sys
 import time
 
-bot = telebot.TeleBot(API)
+def main():
+    global API, ADMIN, bot
+    if len(sys.argv) != 3:
+        print("Usage: tgconsole <id_ADMIN> <API_бота>")
+        sys.exit(1)
+    
+    ADMIN = int(sys.argv[1])
+    API = sys.argv[2]
+    print(API)
+
+    bot = telebot.TeleBot(API)
+    
+    print("Консоль доступна...")
+    bot.send_message(ADMIN, "Консоль доступна...")
+    bot.polling()
+
+
+main()
 
 @bot.message_handler(commands=['start', 'help'])
 def send_welcome(message): # команда /start
@@ -89,7 +107,3 @@ def execute_command(message):  # обработка сообщения поль�
             send_large_message(message.chat.id, str(e))
     else:
         bot.send_message(message.chat.id, "У вас нет прав для использования этого бота.")
-
-print("Консоль доступна...")
-bot.send_message(ADMIN, "Консоль доступна...")
-bot.polling()
