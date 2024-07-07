@@ -20,7 +20,7 @@ def send_welcome(message): # команда /start
 @bot.message_handler(commands=['restart'])
 def restart_bot(message): # команда /restart
     if message.from_user.id == ADMIN:
-        bot.send_message(message.chat.id, "Перезапуск бота...")
+        bot.send_message(message.chat.id, "Перезапуск консоли...")
         time.sleep(1)  # Даем время для отправки сообщения
         # Запускаем новый процесс и завершаем текущий
         subprocess.Popen([sys.executable] + sys.argv)
